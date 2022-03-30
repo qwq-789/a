@@ -54,19 +54,26 @@ export default {
   setup() {
     const input = ref("");
     const list = ref([]);
-    const fixer = ref("");
+    const newList = JSON.parse(sessionStorage.getItem("List"));
+    list.value = newList;
     const push = function () {
       if (input.value == "") {
         return;
       }
       list.value.unshift(input.value);
       input.value = "";
+      sessionStorage.setItem("List", JSON.stringify(list.value));
     };
     const update = function (i, index) {
       const item = document.getElementById(index);
       i = item.value;
       item.blur();
       item.setAttribute("readonly", "readonly");
+
+      return (
+        (list.value[index] = i),
+        sessionStorage.setItem("List", JSON.stringify(list.value))
+      );
     };
     const fix = function (index) {
       const item = document.getElementById(index);
@@ -79,7 +86,7 @@ export default {
     const delAll = function () {
       list.value = [];
     };
-    return { input, list, fixer, push, fix, del, delAll, update };
+    return { input, list, newList, push, fix, del, delAll, update };
   },
 };
 </script>
