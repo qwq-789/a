@@ -20,10 +20,10 @@
   </div>
   <Container
     orientation="vertical"
-    :animation-duration="200"
+    :animation-duration="250"
     drag-class="cursor-grabbing"
     @drop="onDrop"
-    class="flex w-screen flex-col justify-center gap-7 pb-24 pt-10"
+    class="mt-10 flex w-full flex-col justify-center gap-7 pb-24"
   >
     <Draggable
       v-for="(i, index) in list"
@@ -56,7 +56,7 @@
 </template>
 
 <script>
-import { onMounted, ref } from "vue";
+import { ref } from "vue";
 import { Container, Draggable } from "vue3-smooth-dnd";
 const applyDrag = (arr, dragResult) => {
   const { removedIndex, addedIndex, payload } = dragResult;
