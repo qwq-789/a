@@ -18,44 +18,71 @@
       清除
     </button>
   </div>
-  <div class="flex w-screen translate-y-10 flex-col justify-center gap-7">
-    <div
+  <Container
+    orientation="vertical"
+    :animation-duration="200"
+    drag-class="cursor-grabbing"
+    @drop="onDrop"
+    class="flex w-screen flex-col justify-center gap-7 pb-24 pt-10"
+  >
+    <Draggable
       v-for="(i, index) in list"
       :key="index + i"
-      class="mx-auto flex w-[75vw] flex-row items-center justify-between rounded-md border-2 border-stone-500 bg-white py-3 px-4"
+      class="mx-auto flex w-[75vw] cursor-grab flex-row items-center justify-between rounded-md border-2 border-stone-500 bg-white py-3 px-4"
     >
-      <form @submit.prevent="update(i, index)">
-        <input
-          :id="index"
-          autocomplete="off"
-          type="text"
-          :value="i"
-          class="border-2 border-black bg-white py-1 pl-2 outline-none read-only:border-0 read-only:p-0"
-          readonly
-        />
-      </form>
+      <div class="flex w-full flex-row justify-between">
+        <form @submit.prevent="update(i, index)">
+          <input
+            :id="index"
+            autocomplete="off"
+            type="text"
+            :value="i"
+            class="border-2 border-black bg-white py-1 pl-2 outline-none read-only:border-0 read-only:p-0"
+            readonly
+          />
+        </form>
 
-      <div class="flex w-[50px] items-center justify-between">
-        <span class="cursor-pointer" @click="fix(index)">
-          <i class="fa-solid fa-pen"></i>
-        </span>
-        <span class="cursor-pointer" @click="del(index)">
-          <i class="fa-solid fa-trash"></i>
-        </span>
+        <div class="flex w-[50px] items-center justify-between">
+          <span class="cursor-pointer" @click="fix(index)">
+            <i class="fa-solid fa-pen"></i>
+          </span>
+          <span class="cursor-pointer" @click="del(index)">
+            <i class="fa-solid fa-trash"></i>
+          </span>
+        </div>
       </div>
-    </div>
-    <div class="h-10 w-full"></div>
-  </div>
+    </Draggable>
+  </Container>
 </template>
 
 <script>
-import { ref } from "vue";
+import { onMounted, ref } from "vue";
+import { Container, Draggable } from "vue3-smooth-dnd";
+const applyDrag = (arr, dragResult) => {
+  const { removedIndex, addedIndex, payload } = dragResult;
+  if (removedIndex === null && addedIndex === null) return arr;
+  const result = [...arr];
+  let itemToAdd = payload;
+  if (removedIndex !== null) {
+    itemToAdd = result.splice(removedIndex, 1)[0];
+  }
+  if (addedIndex !== null) {
+    result.splice(addedIndex, 0, itemToAdd);
+  }
+  return result;
+};
 export default {
+  components: { Container, Draggable },
   setup() {
     const input = ref("");
     const list = ref([]);
     const newList = JSON.parse(sessionStorage.getItem("List"));
-    list.value = newList;
+    if (sessionStorage.getItem("List")) {
+      list.value = newList;
+    } else {
+      list.value = [];
+    }
+
     const push = function () {
       if (input.value == "") {
         return;
@@ -82,11 +109,27 @@ export default {
     };
     const del = function (index) {
       list.value.splice(index, 1);
+      sessionStorage.setItem("List", JSON.stringify(list.value));
     };
     const delAll = function () {
       list.value = [];
+      sessionStorage.clear("List");
     };
-    return { input, list, newList, push, fix, del, delAll, update };
+    const onDrop = (dropResult) => {
+      list.value = applyDrag(list.value, dropResult);
+      sessionStorage.setItem("List", JSON.stringify(list.value));
+    };
+    return {
+      input,
+      list,
+      newList,
+      push,
+      fix,
+      del,
+      delAll,
+      update,
+      onDrop,
+    };
   },
 };
 </script>

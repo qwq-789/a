@@ -15,7 +15,8 @@
     "prettier-plugin-tailwindcss": "^0.1.8",
     "vitawind": "^2.2.4",
     "vue": "^3.2.25",
-    "vue-smooth-dnd": "^0.8.1"
+    "vue-smooth-dnd": "^0.8.1",
+    "vue3-smooth-dnd": "^0.0.2"
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "^2.2.0",
